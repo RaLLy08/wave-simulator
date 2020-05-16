@@ -3,6 +3,7 @@ import './style.less';
 export const waveButton = () => {
     const btn = document.createElement('button')
     btn.className = 'wave-set__button'
+    btn.innerText = 'SET'
     return btn;
 }
 
