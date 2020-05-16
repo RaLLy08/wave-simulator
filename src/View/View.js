@@ -1,7 +1,7 @@
 import Canvas from "../Canvas";
-import { bottom } from "./Layout/bottom";
+import { bottom, fieldWrapper } from "./Layout/bottom";
 import { waveInput } from "./inputs/wave-input";
-import { waveButton } from "./buttons/button-wave";
+import { waveButton, stopButton } from "./buttons/button-wave";
 
 
 export default class View { 
@@ -16,22 +16,56 @@ export default class View {
         const wrapper = document.createElement('div');
         wrapper.className = 'wrapper'
 
-        const bottomWrapper = bottom()
-        this.button = waveButton()
+        const bottomWrapper = bottom();
         
-        this.input = waveInput();
-        bottomWrapper.append(this.input);
-        bottomWrapper.append(this.button);
+
+        this.ampButton = waveButton() 
+        this.ampInput = waveInput();
+
+        this.freqButton = waveButton() 
+        this.freqInput = waveInput();
+        
+        this.stopButton = stopButton();
+
+        const ampWrapper = fieldWrapper();
+
+        ampWrapper.append(...[this.ampInput, this.ampButton]);
+        
+        const freqWrapper = fieldWrapper();
+
+        freqWrapper.append(...[this.freqInput, this.freqButton]);
+
+        
+
+        bottomWrapper.append(...[ampWrapper, freqWrapper, this.stopButton])
 
         canvasWrapper.append(this._canvas)
+
         wrapper.append(...[canvasWrapper, bottomWrapper])
         this._root.append(wrapper);
     }
     
-    onButtonClick = (cb) => {
-        this.button.onclick = () => {
-            const value = this.input.value;
+    onAmpClick = cb => {
+        this.ampButton.onclick = () => {
+            const value = this.ampInput.value;
             cb(value)
+        }
+    }
+    
+    onFreqClick = cb => {
+        this.freqButton.onclick = () => {
+            const value = this.freqInput.value;
+            cb(value)
+        }
+    }
+
+    onStopClick = cb => {
+        let isStop = false;
+        this.stopButton.onclick = () => {
+            isStop = !isStop;
+            this.stopButton.innerText = isStop ? 'Resume' : 'Stop';
+            this.stopButton.style.backgroundColor = isStop ? '#00cc00': 'red';
+            cb(isStop)
         }
     }
 }

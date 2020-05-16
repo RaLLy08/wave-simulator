@@ -3,3 +3,9 @@ export const bottom = () => {
     bottom.className = 'wrapper__bottom'
     return bottom;
 }
+
+export const fieldWrapper = () => {
+    const fieldWrapper = document.createElement('div');
+    fieldWrapper.className = 'bottom__fieldWrapper'
+    return fieldWrapper;
+}

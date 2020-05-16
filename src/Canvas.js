@@ -11,37 +11,50 @@ export default class Canvas {
 
     }
 
-    draw = (xyrc) => {
+    draw = (waves) => {
         this._ctx.clearRect(0, 0, this._w, this._h);
-        
+
+      
+        //console.log(waves);
         this.axis();
-        this.drawLine(xyrc);
-        this.drawPhasorRound(xyrc);
+        //this.grid()
+        waves.forEach(wave => {
+            const lastPhasorPoint = wave[wave.length - 1]
+
+            wave.forEach(waveYet => {
+                this.drawLine(waveYet)
+            });
+            this.drawPhasorRound(lastPhasorPoint)
+        });
+
+        
     }
 
     drawLine = xyrc => {
-        const {x, y, prevX, prevY, r, color, phasorX} = xyrc;
+        const {x, y, prevX, prevY, r, phasorX} = xyrc;
         //console.log(xyrc);
         this._ctx.beginPath(); 
         this._ctx.strokeStyle = "green"; 
         this._ctx.moveTo(prevX, prevY); 
         this._ctx.lineTo(x, y); 
-        this._ctx.moveTo(phasorX, prevY); 
-        this._ctx.lineTo(x, y); 
+        
         this._ctx.stroke(); 
         this._ctx.lineWidth = r;
         this._ctx.closePath()
     }
 
     drawPhasorRound = xyrc => {
-        const {phasorX, y, maxAmplitude, prevPhasorX, prevPhasorY, prevY, r, color} = xyrc;
-   
+        const {phasorX, x, prevY, y, maxAmplitude, r, color} = xyrc;
+        
         this._ctx.beginPath(); 
        
         this._ctx.arc(maxAmplitude + 30, this._h/2, maxAmplitude, 0, 2 * Math.PI);
         this._ctx.strokeStyle = "green"; 
         this._ctx.moveTo(maxAmplitude + 30, this._h/2); 
-        this._ctx.lineTo(phasorX, y); 
+        this._ctx.lineTo(phasorX, y);
+
+        this._ctx.moveTo(phasorX, prevY); 
+        this._ctx.lineTo(x, y); 
         this._ctx.stroke(); 
         this._ctx.lineWidth = r;
         this._ctx.closePath()
