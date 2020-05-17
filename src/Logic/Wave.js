@@ -59,7 +59,7 @@ export default class Wave {
     setWave = () => {
         const maxAmlitude = 1 * this._h/4;
         const angleSpeed = 1/this._w
-        const f = 1;
+        const f = 12;
 
         waves.addWave({ 
             maxAmplitude: maxAmlitude,
