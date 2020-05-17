@@ -1,24 +1,39 @@
 import { createWrapper } from "./createWrapper"
-import { readOnlyInput, label } from "./inputs/wave-input"
+import { label } from "./inputs/wave-input"
 import './style.less';
 
 export class Header { 
     constructor() {
-        this.headerWrapper = createWrapper('header__wrapper') 
+        this.headerWrapper = createWrapper('wrapper__header') 
 
-        this.ampRInp = createWrapper('amp-field__readOnly') 
-        this.freqRInp = createWrapper('freq-field__readOnly')
+        this.waves = [];    
+    }
+
+    setWaveInputs = (id) => {
+        const ampRInp = createWrapper('amp-field__readOnly', `amp${id}`) 
+        const apmLabel = label('Instant amplitude(i):', 'amp-field__label')
         
-        this.apmLabel = label('Instant amplitude(i):', 'amp-field__label')
-        this.freqLabel = label('Phase:', 'freq-field__label')
+        const waveNumber = label(`${id + 1} wave:`, 'wave-num__label')
 
-        this.ampFieldWrapper = createWrapper('wrapper__amp-field')
-        this.ampFieldWrapper.append(...[this.ampRInp, this.apmLabel])
+        const freqRInp = createWrapper('freq-field__readOnly', `phase${id}`)
+        const freqLabel = label('Phase:', 'freq-field__label')
 
-        this.freqFieldWrapper = createWrapper('wrapper__freq-field')
-        this.freqFieldWrapper.append(...[this.freqRInp, this.freqLabel])
+        const ampFieldWrapper = createWrapper('wrapper__amp-field')
+        const freqFieldWrapper = createWrapper('wrapper__freq-field')
 
-        
-        this.headerWrapper.append(...[this.ampFieldWrapper, this.freqFieldWrapper])
+        ampFieldWrapper.append(...[ampRInp, apmLabel])
+        freqFieldWrapper.append(...[freqRInp, freqLabel])
+
+        const waveWrapper = createWrapper('header__wave-wrapper');
+
+        waveWrapper.append(...[waveNumber, ampFieldWrapper, freqFieldWrapper])
+
+        this.waves.push(waveWrapper);
+
+        this.appendWaves()
+    }
+
+    appendWaves = () => {
+        this.headerWrapper.append(...this.waves)
     }
 }

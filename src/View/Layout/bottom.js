@@ -1,5 +1,5 @@
 import { waveInput, label } from "./inputs/wave-input";
-import { waveButton, stopButton } from "./buttons/button-wave";
+import { waveButton, stopButton, newWaveBtn } from "./buttons/button-wave";
 import { createWrapper } from "./createWrapper";
 
 export class Bottom {
@@ -22,6 +22,8 @@ export class Bottom {
         const freqWrapper = createWrapper('fields__freq-field');
         freqWrapper.append(...[this.freqLabel, this.freqInput, this.freqButton]);
 
+        this.newWaveBtn = newWaveBtn();
+
 
         this.stopButton = stopButton();
         
@@ -29,7 +31,7 @@ export class Bottom {
         this.stopWrapper.append(this.stopButton);
 
         const fields = createWrapper('bottom__fields')
-        fields.append(...[ampWrapper, freqWrapper]);
+        fields.append(...[ampWrapper, freqWrapper, this.newWaveBtn]);
 
         this.bottomWrapper.append(...[fields, this.stopWrapper])
     }

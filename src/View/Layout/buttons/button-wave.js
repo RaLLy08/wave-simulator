@@ -13,7 +13,15 @@ export const stopButton = () => {
     btn.className = 'wave-stop__button'
     btn.style.padding = '10px';
     btn.innerText = 'Stop';
-    btn.style.backgroundColor = 'red';
    
+    return btn;
+}
+
+export const newWaveBtn = () => {
+    const btn = document.createElement('button')
+
+    btn.className = 'wave-new-wave__button'
+    btn.innerText = 'New wave';
+    
     return btn;
 }

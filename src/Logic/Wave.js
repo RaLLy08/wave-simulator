@@ -33,6 +33,7 @@ export default class Wave {
         const params = {
             y,
             phase,
+            id: wave.id,
         }
 
         view.displayParams(params)
@@ -59,7 +60,7 @@ export default class Wave {
     setWave = () => {
         const maxAmlitude = 1 * this._h/4;
         const angleSpeed = 1/this._w
-        const f = 12;
+        const f = 1;
 
         waves.addWave({ 
             maxAmplitude: maxAmlitude,
@@ -72,7 +73,8 @@ export default class Wave {
             xIsStop: false,
             xSpeed: 1,
         });
-        
+        view.displayWaveFields(0)
+
         waves.addWave({ 
             maxAmplitude: 0.5 * this._h/4,
             //angleSpeed,
@@ -84,14 +86,12 @@ export default class Wave {
             xIsStop: false,
             xSpeed: 1,
         });
-        
+        view.displayWaveFields(1)
     }
 
     animate = () => {  
         if (!this.isStop) {
-            const arr = waves.getAllWaves();   
-            console.log(arr);
-            
+            const arr = waves.getAllWaves();
             arr.forEach(wave => {
                 //console.log(wave);
                 
@@ -150,7 +150,7 @@ export default class Wave {
         //debugger
         
         //console.log(Math.sign(wave.prevY - this._h/2) !== Math.sign(wave.y - this._h/2));
-        this.displayParams(wave);
+        wave && this.displayParams(wave);
         waves.addWaveById(wave.id, wave)
     }
 

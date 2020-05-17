@@ -49,10 +49,24 @@ export default class View {
         }
     }
 
-    displayParams = (params) => {
-        const {y, f, phase, angleSpeed} = params
+    onNewWaveClick = cb => {
+        this.bottom.newWaveBtn.onclick = () => {
+            cb()
+        }
+    }
 
-        this.header.ampRInp.innerText = y
-        this.header.freqRInp.innerText = phase
+    displayParams = (params) => {
+        const {y, f, phase, angleSpeed, id} = params
+        //if (!id) return;
+
+        const amp = document.getElementById(`amp${id}`)
+        const phs = document.getElementById(`phase${id}`)
+        
+        amp.innerText = y
+        phs.innerText = phase
+    }
+
+    displayWaveFields = (id) => {
+        this.header.setWaveInputs(id)
     }
 }
