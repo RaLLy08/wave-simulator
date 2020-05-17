@@ -17,17 +17,30 @@ export default class Wave {
         view.onAmpClick(this.setAmplitude);
         view.onFreqClick(this.setFreq);
 
-        view.onStopClick(this.stop)
+        view.onStopClick(() => this.isStop = !this.isStop)
     }
-    stop = (id) => {
-        this.isStop = !this.isStop
-        const wave = waves.getWaveById(0)
-        const lastPoint = wave[wave.length - 1]
 
-        const currAmp = -Math.round(((lastPoint.y - this._h/2)/180)*10000)/10000
+    displayParams = (wave) => {
+        //this.isStop = !this.isStop
+        //const wave = waves.getWaveById(0)
+        //const lastPoint = wave[wave.length - 1]
+
+        const y = -Math.round(((wave.y - this._h/2)/180)*1000)/1000
+        const f = wave.f;
+
+       const phase = ((wave.angleSpeed * wave.t)*180/Math.PI | 0) % 360;
+       
+        const params = {
+            y,
+            phase,
+        }
+
+        view.displayParams(params)
     }
 
     setAmplitude = (amp, id) => {
+        //view.waveCanvas._xAxisStartPosition += +amp*64*3
+        
         const wave = waves.getWaveById(0)
 
         wave.forEach(el => {
@@ -44,7 +57,7 @@ export default class Wave {
     }
 
     setWave = () => {
-        const maxAmlitude = 0.2 * this._h/4;
+        const maxAmlitude = 1 * this._h/4;
         const angleSpeed = 1/this._w
         const f = 1;
 
@@ -60,12 +73,25 @@ export default class Wave {
             xSpeed: 1,
         });
         
+        waves.addWave({ 
+            maxAmplitude: 0.5 * this._h/4,
+            //angleSpeed,
+            f: 2,
+            r:1.2,
+            t: 0,
+            id: 1,
+            xt: 0,
+            xIsStop: false,
+            xSpeed: 1,
+        });
+        
     }
 
     animate = () => {  
         if (!this.isStop) {
             const arr = waves.getAllWaves();   
-
+            console.log(arr);
+            
             arr.forEach(wave => {
                 //console.log(wave);
                 
@@ -99,8 +125,7 @@ export default class Wave {
         //window.requestAnimationFrame(this.animate)
     }
     
-    waveMove = (wave) => {
-        
+    waveMove = (wave) => {   
         wave.prevY = wave.y
         wave.prevX = wave.x
         wave.prevPhasorX = wave.phasorX
@@ -110,7 +135,7 @@ export default class Wave {
         wave.angleSpeed = wave.angleSpeed && !wave.f ? wave.angleSpeed : 2 * Math.PI * (wave.f /(this._w/2));
 
         wave.y = this._h/2 - wave.maxAmplitude * Math.sin(wave.angleSpeed * wave.t)
-        wave.phasorX = this._h/2 - wave.maxAmplitude * Math.cos(wave.angleSpeed * wave.t) - 150
+        wave.phasorX = wave.maxAmplitude * Math.cos(wave.angleSpeed * wave.t)
         
         //console.log(wave.xIsStop);
 
@@ -125,7 +150,9 @@ export default class Wave {
         //debugger
         
         //console.log(Math.sign(wave.prevY - this._h/2) !== Math.sign(wave.y - this._h/2));
-        
+        this.displayParams(wave);
         waves.addWaveById(wave.id, wave)
     }
+
+    distance = (x1, y1, x2, y2) => Math.sqrt((Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2)));
 }

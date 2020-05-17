@@ -9,13 +9,14 @@ export default class Canvas {
         this._canvas.setAttribute('height', this._h);
         this._ctx = this._canvas.getContext('2d');
 
+        this._xAxisStartPosition = X_AXIS_START_POSITION;
     }
 
     draw = (waves) => {
         this._ctx.clearRect(0, 0, this._w, this._h);
 
         this.axis();
-        //this.grid()
+        this.grid()
         waves.forEach(wave => {
             const lastPhasorPoint = wave[wave.length - 1];
             const firstPoint = wave[0];
@@ -55,15 +56,26 @@ export default class Canvas {
     drawPhasorRound = xyrc => {
         const {phasorX, x, prevY, y, maxAmplitude, r, color} = xyrc;
         
-        this._ctx.beginPath(); 
-       
-        this._ctx.arc(X_AXIS_START_POSITION/2 + 11, this._h/2, maxAmplitude, 0, 2 * Math.PI);
-        this._ctx.strokeStyle = "green"; 
-        this._ctx.moveTo(X_AXIS_START_POSITION/2 + 11, this._h/2); 
-        this._ctx.lineTo(phasorX, y);
+        const arcX = this._xAxisStartPosition/2
+        const arcY = this._h/2;
+        const arcRadius = maxAmplitude;
+        
+        const vectorFromX = this._xAxisStartPosition/2 
+        const vectorFromY = this._h/2
 
-        this._ctx.moveTo(phasorX, prevY); 
-        this._ctx.lineTo(x, y); 
+        const vectorToX = phasorX + this._xAxisStartPosition/2
+        const vectorToY = y
+
+        this._ctx.beginPath(); 
+        this._ctx.arc(arcX, arcY, arcRadius, 0, 2 * Math.PI);
+        this._ctx.strokeStyle = "green"; 
+
+        this._ctx.moveTo(vectorFromX, vectorFromY); 
+        this._ctx.lineTo(vectorToX, vectorToY);
+
+        // this._ctx.moveTo(phasorX, prevY); 
+        // this._ctx.lineTo(x, y); 
+
         this._ctx.stroke(); 
         this._ctx.lineWidth = r;
         this._ctx.closePath()
@@ -80,7 +92,7 @@ export default class Canvas {
 
     xScale = (opts) => {
         const { shift } = opts
-        const xWidth = this._w -  X_AXIS_START_POSITION
+        const xWidth = this._w -  this._xAxisStartPosition
         const period = 64/opts.f;
         const height = this._h/2 ;
         const value = xWidth/period
@@ -89,7 +101,7 @@ export default class Canvas {
         const startX = -(shift % period)
 
         for (let i = 1; i <= value; i++) {
-            let xPosition = xWidth*i/value + startX + X_AXIS_START_POSITION;
+            let xPosition = xWidth*i/value + startX + this._xAxisStartPosition;
             
             if (!(i % 1)) this._ctx.fillText((i+ shiftNumb)/5, xPosition - 7 , height + 20);
             this._ctx.strokeRect(xPosition, height - 5, 0, 10); 
@@ -98,50 +110,44 @@ export default class Canvas {
     }
     
     yScale = (opts) => {
-        const xWidth = this._w -  X_AXIS_START_POSITION
-    
         const value = Y_AXIS_VALUE_OF_POINTS;
-        const height = this._h/2 ;
-    
+
         for (let i = 1; i <= value; i++) {
-            //let yPosition = this._h*i/value + X_AXIS_START_POSITION;
+            //let yPosition = this._h*i/value + this._xAxisStartPosition;
             
-             this._ctx.fillText(-Math.round(((i/5) - value/10)*10)/10, X_AXIS_START_POSITION + 10 ,this._h*i/value);
-            this._ctx.strokeRect(X_AXIS_START_POSITION - 5, this._h*i/value, 10, 0);     
+             this._ctx.fillText(-Math.round(((i/5) - value/10)*10)/10, this._xAxisStartPosition + 10 ,this._h*i/value);
+            this._ctx.strokeRect(this._xAxisStartPosition - 5, this._h*i/value, 10, 0);     
         }    
     }
 
     grid = () => {
-        let s = 28
-        let nX = Math.floor(this._w / s) - 2
-        let nY = Math.floor(this._h / s) - 2
-        let pX = this._w - nX * s
-        let pY = this._h - nY * s
-        let pL = pX / 2
-        let pR = pX / 2
-        let pT = pY / 2
-        let pB = pY / 2
-        
-        this._ctx.strokeStyle = 'lightgrey'
+        const yPeriod = 36;
+        const xPeriod = 64;
+        const yValue = this._h/yPeriod
+        const xValue = this._w/xPeriod
+  
         this._ctx.beginPath()
-        for (var x = pL; x <= this._w - pR; x += s) {
-           this._ctx.moveTo(x, pT)
-           this._ctx.lineTo(x, this._h - pB)
+
+        this._ctx.strokeStyle = 'lightgrey'
+
+        for (let i = 0; i < yValue; i++) {
+            if (i*yPeriod !== this._h/2) this._ctx.strokeRect(0, i*yPeriod, this._w, 0.1);
         }
-        for (var y = pT; y <= this._h - pB; y += s) {
-           this._ctx.moveTo(pL, y)
-           this._ctx.lineTo(this._w - pR, y)
+        for (let i = 0; i < xValue; i++) {
+            if (i*xPeriod !== this._xAxisStartPosition) this._ctx.strokeRect(i*xPeriod, 0, 0.1, this._w);
         }
+
         this._ctx.stroke()
     }
 
     axis = () => {
         this._ctx.beginPath();
-        this._ctx.moveTo(X_AXIS_START_POSITION, this._h/2);
+        this._ctx.moveTo(0, this._h/2);
         this._ctx.lineTo(this._w, this._h/2);
         this._ctx.strokeStyle = "blue"
-        this._ctx.moveTo(X_AXIS_START_POSITION, 0);
-        this._ctx.lineTo(X_AXIS_START_POSITION, this._h);
+        this._ctx.moveTo(this._xAxisStartPosition, 0);
+        this._ctx.lineTo(this._xAxisStartPosition, this._h);
+
         this._ctx.stroke();      
     }
 

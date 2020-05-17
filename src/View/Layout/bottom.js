@@ -8,27 +8,29 @@ export class Bottom {
 
         this.bottomWrapper.className = 'wrapper__bottom';
   
-        this.ampLabel = label('Amplitute (Imax)');
+        this.ampLabel = label('Amplitute (Imax)', 'amp-field__label');
         this.ampButton = waveButton() 
         this.ampInput = waveInput();
 
-        this.freqLabel = label('Frequency per second');
+        const ampWrapper = createWrapper('fields__amp-field');
+        ampWrapper.append(...[this.ampLabel, this.ampInput, this.ampButton]);
+
+        this.freqLabel = label('Frequency per second', 'freq-field__label');
         this.freqButton = waveButton() 
         this.freqInput = waveInput();
-        
-        this.stopButton = stopButton();
 
-        const ampWrapper = createWrapper('bottom__fieldWrapper');
-
-        ampWrapper.append(...[this.ampLabel, this.ampInput, this.ampButton]);
-        
-        const freqWrapper = createWrapper('bottom__fieldWrapper');
-
+        const freqWrapper = createWrapper('fields__freq-field');
         freqWrapper.append(...[this.freqLabel, this.freqInput, this.freqButton]);
 
-        
-        this.bottomWrapper.append(...[ampWrapper, freqWrapper, this.stopButton])
 
-        //return bottomWrapper;
+        this.stopButton = stopButton();
+        
+        this.stopWrapper = createWrapper('bottom__stop-wrapper');
+        this.stopWrapper.append(this.stopButton);
+
+        const fields = createWrapper('bottom__fields')
+        fields.append(...[ampWrapper, freqWrapper]);
+
+        this.bottomWrapper.append(...[fields, this.stopWrapper])
     }
 }
