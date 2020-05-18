@@ -20,20 +20,15 @@ export default class Wave {
         view.onStopClick(() => this.isStop = !this.isStop)
     }
 
-    displayParams = (wave) => {
-        //this.isStop = !this.isStop
-        //const wave = waves.getWaveById(0)
-        //const lastPoint = wave[wave.length - 1]
-
-        const y = -Math.round(((wave.y - this._h/2)/180)*1000)/1000
-        const f = wave.f;
-
-       const phase = ((wave.angleSpeed * wave.t)*180/Math.PI | 0) % 360;
-       
+    displayParams = ({phase, angleSpeed, t, y, id, f, maxAmplitude}) => {
+        const amp = -Math.round(((y - this._h/2)/180)*1000)/1000
+        const clearPhase = ((angleSpeed * t + phase*Math.PI/180)*180/Math.PI | 0) % 360;
+        //const clearPhase = Math.asin((y - this._h/2)/maxAmplitude) * (57)
         const params = {
-            y,
-            phase,
-            id: wave.id,
+            id,
+            amp,
+            phase: clearPhase,
+            
         }
 
         view.displayParams(params)
@@ -41,7 +36,6 @@ export default class Wave {
 
     setAmplitude = (amp, id) => {
         //view.waveCanvas._xAxisStartPosition += +amp*64*3
-        
         const wave = waves.getWaveById(0)
 
         wave.forEach(el => {
@@ -59,34 +53,39 @@ export default class Wave {
 
     setWave = () => {
         const maxAmlitude = 1 * this._h/4;
-        const angleSpeed = 1/this._w
+        const angleSpeed = 6.283 / (64 * 10)
         const f = 1;
+        // distance between 2 schale points are equal to 64 px by x, by y - 36, and the values of points y and x - 20;
 
         waves.addWave({ 
             maxAmplitude: maxAmlitude,
-            //angleSpeed,
-            f,
+            angleSpeed,
+            //f,
             r:1.2,
             t: 0,
             id: 0,
-            xt: 0,
             xIsStop: false,
             xSpeed: 1,
+            color: 'black',
+            phase: 0,
+            waveForm: 'sine',
         });
         view.displayWaveFields(0)
 
-        waves.addWave({ 
-            maxAmplitude: 0.5 * this._h/4,
-            //angleSpeed,
-            f: 2,
-            r:1.2,
-            t: 0,
-            id: 1,
-            xt: 0,
-            xIsStop: false,
-            xSpeed: 1,
-        });
-        view.displayWaveFields(1)
+        // waves.addWave({ 
+        //     maxAmplitude: 0.5 * this._h/4,
+        //     //angleSpeed,
+        //     f: 2,
+        //     r:1.2,
+        //     t: 0,
+        //     id: 1,
+        //     xt: 0,
+        //     xIsStop: false,
+        //     xSpeed: 1,
+        //     color: 'blue',
+        // });
+        // view.displayWaveFields(1)
+
     }
 
     animate = () => {  
@@ -126,33 +125,55 @@ export default class Wave {
     }
     
     waveMove = (wave) => {   
-        wave.prevY = wave.y
-        wave.prevX = wave.x
-        wave.prevPhasorX = wave.phasorX
+        const {
+            x,
+            y,
+            phasorX,
+        } = wave
 
+        wave.prevX = x
+        wave.prevY = y
+        wave.prevPhasorX = phasorX
+        
         //y - current amplitude
         // r = wave.maxAmplitude;
+        //frequency is preferred
         wave.angleSpeed = wave.angleSpeed && !wave.f ? wave.angleSpeed : 2 * Math.PI * (wave.f /(this._w/2));
 
-        wave.y = this._h/2 - wave.maxAmplitude * Math.sin(wave.angleSpeed * wave.t)
-        wave.phasorX = wave.maxAmplitude * Math.cos(wave.angleSpeed * wave.t)
+        this.changeByWaveForm(wave);
         
-        //console.log(wave.xIsStop);
-
-        //wave.xt = wave.xIsStop ? wave.xt : wave.t  
-
         wave.x = wave.xt + X_AXIS_START_POSITION
+        wave && this.displayParams(wave);
         
-        wave.t += 1;
-
         if (!wave.xIsStop) wave.xt = wave.t;
         
         //debugger
         
         //console.log(Math.sign(wave.prevY - this._h/2) !== Math.sign(wave.y - this._h/2));
-        wave && this.displayParams(wave);
-        waves.addWaveById(wave.id, wave)
+        wave.t += 1;
+        
+        waves.addWaveById(wave.id, wave);
     }
+
+    changeByWaveForm = (wave) => {
+        switch (wave.waveForm) {
+            case 'sine':
+                wave.y = this._h/2 - wave.maxAmplitude * Math.sin(wave.angleSpeed * wave.t + wave.phase * Math.PI/180)
+                wave.phasorX = wave.maxAmplitude * Math.cos(wave.angleSpeed * wave.t + wave.phase * Math.PI/180)
+                break;
+            case 'cosine':
+                wave.y = this._h/2 - wave.maxAmplitude * Math.cos(wave.angleSpeed * wave.t + wave.phase * Math.PI/180)
+                wave.phasorX = wave.maxAmplitude * Math.sin(wave.angleSpeed * wave.t + wave.phase * Math.PI/180)
+                break;
+            case 'meander':
+                wave.y = this._h/2 - wave.maxAmplitude * Math.sign(Math.sin(wave.angleSpeed * wave.t + wave.phase * Math.PI/180))
+                wave.phasorX = wave.maxAmplitude * Math.sign(Math.cos(wave.angleSpeed * wave.t + wave.phase * Math.PI/180))
+                break;
+            default:
+                break;
+        }
+    }
+
 
     distance = (x1, y1, x2, y2) => Math.sqrt((Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2)));
 }

@@ -56,14 +56,14 @@ export default class View {
     }
 
     displayParams = (params) => {
-        const {y, f, phase, angleSpeed, id} = params
+        const {amp, f, phase, angleSpeed, id} = params
         //if (!id) return;
 
-        const amp = document.getElementById(`amp${id}`)
-        const phs = document.getElementById(`phase${id}`)
+        const ampDisp = document.getElementById(`amp${id}`)
+        const phaseDisp = document.getElementById(`phase${id}`)
         
-        amp.innerText = y
-        phs.innerText = phase
+        ampDisp.innerText = amp
+        phaseDisp.innerText = phase
     }
 
     displayWaveFields = (id) => {

@@ -13,10 +13,9 @@ export default class Canvas {
     }
 
     draw = (waves) => {
-        this._ctx.clearRect(0, 0, this._w, this._h);
+        this.clearCanvas()
+        this.viewElements();
 
-        this.axis();
-        this.grid()
         waves.forEach(wave => {
             const lastPhasorPoint = wave[wave.length - 1];
             const firstPoint = wave[0];
@@ -27,24 +26,20 @@ export default class Canvas {
 
             this.drawPhasorRound(lastPhasorPoint)
 
-            this.xScale({
-                value: X_AXIS_VALUE_OF_POINTS,
-                startX: 0,
+            this.schales({
                 shift: firstPoint.t,
                 f: 1
-            });
-
-            this.yScale()
+            })
         });
 
        
     }
 
     drawLine = xyrc => {
-        const {x, y, prevX, prevY, r, phasorX} = xyrc;
+        const {x, y, prevX, prevY, r, phasorX, color} = xyrc;
         //console.log(xyrc);
         this._ctx.beginPath(); 
-        this._ctx.strokeStyle = "green"; 
+        this._ctx.strokeStyle = color; 
         this._ctx.moveTo(prevX, prevY); 
         this._ctx.lineTo(x, y); 
         
@@ -67,27 +62,35 @@ export default class Canvas {
         const vectorToY = y
 
         this._ctx.beginPath(); 
-        this._ctx.arc(arcX, arcY, arcRadius, 0, 2 * Math.PI);
-        this._ctx.strokeStyle = "green"; 
 
+        this._ctx.arc(arcX, arcY, arcRadius, 0, 2 * Math.PI);
+        this._ctx.strokeStyle = color 
+        
         this._ctx.moveTo(vectorFromX, vectorFromY); 
         this._ctx.lineTo(vectorToX, vectorToY);
 
-        // this._ctx.moveTo(phasorX, prevY); 
-        // this._ctx.lineTo(x, y); 
+        this._ctx.stroke();
 
+        this._ctx.moveTo(vectorToX, prevY);
+        this._ctx.lineWidth = 0.3;  
+
+        this._ctx.lineTo(x, y); 
+        this._ctx.strokeStyle = color; 
+        
         this._ctx.stroke(); 
-        this._ctx.lineWidth = r;
+        
         this._ctx.closePath()
     }
 
     viewElements = () => {
-        this._ctx.beginPath(); 
-        this._ctx.font = "20px Georgia";
-        
-        this._ctx.fillText('ωt', this._w - 25, this._h/2 + 20);
-        
-        this._ctx.closePath() 
+        this.axis()
+        this.grid()
+    }
+
+    schales = (opts) => {
+        this._ctx.lineWidth = 1; 
+        this.xScale(opts);
+        this.yScale(opts);
     }
 
     xScale = (opts) => {
@@ -109,13 +112,11 @@ export default class Canvas {
         }
     }
     
-    yScale = (opts) => {
+    yScale = () => {
         const value = Y_AXIS_VALUE_OF_POINTS;
 
         for (let i = 1; i <= value; i++) {
-            //let yPosition = this._h*i/value + this._xAxisStartPosition;
-            
-             this._ctx.fillText(-Math.round(((i/5) - value/10)*10)/10, this._xAxisStartPosition + 10 ,this._h*i/value);
+            this._ctx.fillText(-Math.round(((i/5) - value/10)*10)/10, this._xAxisStartPosition + 10 ,this._h*i/value);
             this._ctx.strokeRect(this._xAxisStartPosition - 5, this._h*i/value, 10, 0);     
         }    
     }
@@ -125,38 +126,39 @@ export default class Canvas {
         const xPeriod = 64;
         const yValue = this._h/yPeriod
         const xValue = this._w/xPeriod
-  
-        this._ctx.beginPath()
+        const thickness = 1;
+        //this._ctx.beginPath()
 
         this._ctx.strokeStyle = 'lightgrey'
-
+        this._ctx.lineWidth = thickness; 
         for (let i = 0; i < yValue; i++) {
             if (i*yPeriod !== this._h/2) this._ctx.strokeRect(0, i*yPeriod, this._w, 0.1);
         }
         for (let i = 0; i < xValue; i++) {
             if (i*xPeriod !== this._xAxisStartPosition) this._ctx.strokeRect(i*xPeriod, 0, 0.1, this._w);
         }
-
-        this._ctx.stroke()
+        
+        //this._ctx.stroke()
+        //this._ctx.closePath()
     }
 
     axis = () => {
+        const thickness = 1;
+        const color = "blue";
+
         this._ctx.beginPath();
+        this._ctx.lineWidth = thickness; 
         this._ctx.moveTo(0, this._h/2);
         this._ctx.lineTo(this._w, this._h/2);
-        this._ctx.strokeStyle = "blue"
+        this._ctx.strokeStyle = color;
         this._ctx.moveTo(this._xAxisStartPosition, 0);
         this._ctx.lineTo(this._xAxisStartPosition, this._h);
 
         this._ctx.stroke();      
     }
 
-    replaceWaveView = (x, y) => {
-        this._ctx.translate(x,y)
-    }
-
     clearCanvas = () => {
-        this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+        this._ctx.clearRect(0, 0, this._w, this._h);
     }
 
 }
