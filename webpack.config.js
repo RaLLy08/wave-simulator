@@ -5,13 +5,13 @@ const CssWebpackPlugin = require('mini-css-extract-plugin');
 module.exports = {
     mode: 'development',
     entry: path.resolve(__dirname, './src/index.js'),
-    watch: true,
+    //watch: true,
     output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, '../wave-simulator-back/public')
     },
     devServer: {
-        port: 3333,
+        port: 7776,
         contentBase: path.resolve(__dirname, './build'),
         hot: true,
         open: true,
