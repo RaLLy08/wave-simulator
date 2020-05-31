@@ -68,11 +68,27 @@ export default class Wave {
             id: 0,
             xIsStop: false,
             xSpeed: 1,
-            color: 'black',
+            color: 'green',
             phase: 0,
-            waveForm: 'cosine',
+            waveForm: 'meander',
         });
         view.displayWaveFields(0)
+
+        waves.addWave({ 
+            maxAmplitude: 0.5 * this._h/4,
+            //angleSpeed,
+            f: 2,
+            r:1.2,
+            t: 0,
+            id: 1,
+            xt: 0,
+            xIsStop: false,
+            xSpeed: 1,
+            phase: 0,
+            color: 'blue',
+            waveForm: 'sine',
+        });
+        view.displayWaveFields(1)
 
         // waves.addWave({ 
         //     maxAmplitude: 0.5 * this._h/4,
@@ -80,16 +96,30 @@ export default class Wave {
         //     f: 2,
         //     r:1.2,
         //     t: 0,
-        //     id: 1,
+        //     id: 2,
         //     xt: 0,
         //     xIsStop: false,
         //     xSpeed: 1,
         //     phase: 0,
         //     color: 'blue',
-        //     waveForm: 'sine',
+        //     waveForm: 'cosine',
         // });
-        // view.displayWaveFields(1)
-
+        // view.displayWaveFields(2)
+        // waves.addWave({ 
+        //     maxAmplitude: 0.5 * this._h/4,
+        //     //angleSpeed,
+        //     f: 3,
+        //     r:1.2,
+        //     t: 0,
+        //     id: 3,
+        //     xt: 0,
+        //     xIsStop: false,
+        //     xSpeed: 1,
+        //     phase: 0,
+        //     color: 'blue',
+        //     waveForm: 'cosine',
+        // });
+        // view.displayWaveFields(3)
     }
 
     animate = () => {  
@@ -135,9 +165,9 @@ export default class Wave {
             phasorX,
         } = wave
 
-        wave.prevX = x
-        wave.prevY = y
-        wave.prevPhasorX = phasorX
+        wave.prevX = x;
+        wave.prevY = y;
+        wave.prevPhasorX = phasorX;
         
         //y - current amplitude
         // r = wave.maxAmplitude;
@@ -151,9 +181,6 @@ export default class Wave {
         
         if (!wave.xIsStop) wave.xt = wave.t;
         
-        //debugger
-        
-        //console.log(Math.sign(wave.prevY - this._h/2) !== Math.sign(wave.y - this._h/2));
         wave.t += 1;
         
         waves.addWaveById(wave.id, wave);
@@ -178,7 +205,6 @@ export default class Wave {
                 wave.phasorX = wave.maxAmplitude * Math.cos(wave.angleSpeed * wave.t + wave.phase * Math.PI/180)
         }
     }
-
 
     distance = (x1, y1, x2, y2) => Math.sqrt((Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2)));
 }

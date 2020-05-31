@@ -15,7 +15,7 @@ export default class Canvas {
     draw = (waves) => {
         this.clearCanvas()
         this.viewElements();
-
+        
         waves.forEach(wave => {
             const lastPhasorPoint = wave[wave.length - 1];
             const firstPoint = wave[0];
@@ -31,8 +31,6 @@ export default class Canvas {
                 f: 1
             })
         });
-
-       
     }
 
     drawLine = xyrc => {
