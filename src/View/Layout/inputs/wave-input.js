@@ -1,6 +1,7 @@
-export const waveInput = () => {
+export const waveInput = (value) => {
     const inp = document.createElement('input')
-
+    //inp.style.fontSize = '14px'
+    if (value) inp.value = value;
     return inp;
 }
 

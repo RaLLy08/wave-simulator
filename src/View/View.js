@@ -2,6 +2,7 @@ import Canvas from "../Canvas";
 import './style.less'
 import { Bottom } from "./Layout/Bottom";
 import { Header } from "./Layout/Header";
+//import { select } from "./Layout/select";
 
 export default class View { 
     constructor() {
@@ -17,7 +18,8 @@ export default class View {
 
         this.bottom = new Bottom();
         this.header = new Header();
-
+        
+        
         canvasWrapper.append(this._canvas)
 
 
@@ -28,14 +30,16 @@ export default class View {
     onAmpClick = cb => {
         this.bottom.ampButton.onclick = () => {
             const value = this.bottom.ampInput.value;
-            cb(value)
+            const waveId = document.getElementById('wave-select').value
+            cb(value, waveId)
         }
     }
     
     onFreqClick = cb => {
         this.bottom.freqButton.onclick = () => {
             const value = this.bottom.freqInput.value;
-            cb(value)
+            const waveId = document.getElementById('wave-select').value
+            cb(value, waveId)
         }
     }
 
@@ -55,7 +59,7 @@ export default class View {
         }
     }
 
-    displayParams = (params) => {
+    displayInstParams = (params) => {
         const {amp, f, phase, angleSpeed, id} = params
         //if (!id) return;
 
@@ -68,5 +72,12 @@ export default class View {
 
     displayWaveFields = (id) => {
         this.header.setWaveInputs(id)
+    }
+
+    onSelectClick = (cb) => {
+        const select = document.getElementById('wave-select');
+        select.onclick = () => {
+            cb(select.value)
+        }
     }
 }

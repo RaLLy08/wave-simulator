@@ -8,19 +8,20 @@ export default class Wave {
         this._w = CANVAS_WIDTH;
         this._h = CANVAS_HEIGHT;
         this.isStop = false;
-        //window.requestAnimationFrame(this.animate)
-        setInterval(() => {
-            this.animate()
-        }, 0);
+        window.requestAnimationFrame(this.animate)
+        // setInterval(() => {
+        //     this.animate()
+        // }, 0);
         this.setWave()
         
         view.onAmpClick(this.setAmplitude);
         view.onFreqClick(this.setFreq);
 
+        view.onSelectClick(this.dispParams);
         view.onStopClick(() => this.isStop = !this.isStop)
     }
 
-    displayParams = ({phase, angleSpeed, t, y, id, f, maxAmplitude, waveForm}) => {
+    displayInstParams = ({phase, angleSpeed, t, y, id, f, maxAmplitude, waveForm}) => {
         const amp = -Math.round(((y - this._h/2)/180)*1000)/1000
         //let clearPhase = Math.asin((y - this._h/2)/maxAmplitude) * (180/Math.PI);
         let clearPhase = ((angleSpeed * t + phase*Math.PI/180)*180/Math.PI | 0) % 360;
@@ -33,12 +34,21 @@ export default class Wave {
             phase: clearPhase,  
         }
 
-        view.displayParams(params)
+        view.displayInstParams(params)
+    }
+
+    dispParams = (waveId) => {
+        const wave = waves.getWaveById(waveId);
+        const last = wave[wave.length - 1]
+        const amp = last.maxAmplitude / (this._h/4)
+        const freg = last.f
+        
+        view.bottom.changeInput(amp, freg)
     }
 
     setAmplitude = (amp, id) => {
         //view.waveCanvas._xAxisStartPosition += +amp*64*3
-        const wave = waves.getWaveById(0)
+        const wave = waves.getWaveById(id)
 
         wave.forEach(el => {
             el.maxAmplitude = +amp * this._h/4
@@ -46,7 +56,7 @@ export default class Wave {
     }
 
     setFreq = (f, id) => {
-        const wave = waves.getWaveById(0)
+        const wave = waves.getWaveById(id)
 
         wave.forEach(el => {
             el.f = +f
@@ -60,34 +70,37 @@ export default class Wave {
         // distance between 2 schale points are equal to 64 px by x, by y - 36, and the values of points y and x - 20;
 
         waves.addWave({ 
-            maxAmplitude: maxAmlitude,
-            //angleSpeed,
-            f,
-            r:1.2,
-            t: 0,
-            id: 0,
-            xIsStop: false,
-            xSpeed: 1,
-            color: 'green',
-            phase: 0,
-            waveForm: 'meander',
-        });
-        view.displayWaveFields(0)
-
-        waves.addWave({ 
             maxAmplitude: 0.5 * this._h/4,
             //angleSpeed,
             f: 2,
             r:1.2,
             t: 0,
-            id: 1,
+            id: 0,
             xt: 0,
             xIsStop: false,
             xSpeed: 1,
             phase: 0,
             color: 'blue',
             waveForm: 'sine',
+            tKoef: 3,
         });
+
+        view.displayWaveFields(0)
+        waves.addWave({ 
+            maxAmplitude: maxAmlitude,
+            //angleSpeed,
+            f,
+            r:1.2,
+            t: 0,
+            id: 1,
+            xIsStop: false,
+            xSpeed: 1,
+            color: 'green',
+            phase: 0,
+            waveForm: 'meander',
+            tKoef: 3,
+        });
+      
         view.displayWaveFields(1)
 
         // waves.addWave({ 
@@ -132,20 +145,20 @@ export default class Wave {
     
                 wave.forEach((waveYet) => {
         
-                    const speed = 1
+                    //const speed = 3
     
                     if (waveYet.xIsStop) {
-                        waveYet.x -= speed;
-                        waveYet.prevX -= speed;
+                        waveYet.x -= waveYet.tKoef;
+                        waveYet.prevX -= waveYet.tKoef;
                     }
              
                     if (last.x > this._w) {
                         waveYet.xIsStop = true
                     }
                 });
-         
+                
                 // if the wave is longer than area
-                if (wave.length > CANVAS_WIDTH - X_AXIS_START_POSITION) wave.shift();
+                if (wave.length * last.tKoef > CANVAS_WIDTH - X_AXIS_START_POSITION) wave.shift();
     
                 const lastPoint = {...wave[wave.length - 1]}
     
@@ -155,7 +168,7 @@ export default class Wave {
         
             view.waveCanvas.draw(arr);
         }
-        //window.requestAnimationFrame(this.animate)
+        window.requestAnimationFrame(this.animate)
     }
     
     waveMove = (wave) => {   
@@ -177,11 +190,11 @@ export default class Wave {
         this.changeByWaveForm(wave);
         
         wave.x = wave.xt + X_AXIS_START_POSITION
-        wave && this.displayParams(wave);
+        wave && this.displayInstParams(wave);
         
         if (!wave.xIsStop) wave.xt = wave.t;
         
-        wave.t += 1;
+        wave.t += wave.tKoef;
         
         waves.addWaveById(wave.id, wave);
     }
