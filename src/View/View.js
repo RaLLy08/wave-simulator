@@ -46,6 +46,7 @@ export default class View {
     onStopClick = cb => {
         let isStop = false;
         this.bottom.stopButton.onclick = () => {
+            
             isStop = !isStop;
             this.bottom.stopButton.innerText = isStop ? 'Resume' : 'Stop';
             this.bottom.stopButton.style.backgroundColor = isStop ? '#00cc00': 'red';
